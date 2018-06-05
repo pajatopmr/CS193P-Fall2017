@@ -9,53 +9,69 @@
 import UIKit
 
 class ViewController: UIViewController {
-    
+
     private lazy var game = ConcentrationModel(numberOfPairsOfCards: numberOfPairsOfCards)
-    
+
     var numberOfPairsOfCards: Int {
         return (cardButtons.count + 1) / 2
     }
-    
+
     private(set) var flipCount = 0 {
         didSet {
-            flipCountLabel.text = "Flips: \(flipCount)"
+            updateFlipCountLabel()
         }
     }
     
-    @IBOutlet private weak var flipCountLabel: UILabel!
-    
+    private func updateFlipCountLabel() {
+        let attributes: [NSAttributedStringKey:Any] = [
+            .strokeWidth : 5.0,
+            .strokeColor : #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
+        ]
+        let attributedString = NSAttributedString(string: "Flips: \(flipCount)", attributes: attributes)
+        flipCountLabel.attributedText = attributedString
+    }
+ 
+    @IBOutlet private weak var flipCountLabel: UILabel! {
+        didSet {
+            updateFlipCountLabel()
+        }
+    }
+
     @IBOutlet private var cardButtons: [UIButton]!
-    
+
     @IBAction private func touchCard(_ sender: UIButton) {
         flipCount += 1
         if let cardNumber = cardButtons.index(of: sender) {
+            print("Card touched has number \(cardNumber)")
             game.chooseCard(at: cardNumber)
             updateViewFromModel()
         } else {
             print("Invalid button: not connected!")
         }
     }
-    
+
     func updateViewFromModel() {
         for index in cardButtons.indices {
             processCard(withCard: game.cards[index], withButton: cardButtons[index])
         }
     }
-    
+
     private func processCard(withCard card: Card, withButton button: UIButton) {
         button.setTitle(card.isFaceUp ? emoji(for: card) : "", for: UIControlState.normal)
         button.backgroundColor = card.isFaceUp ? #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0) : card.isMatched ? #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0) : #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 1)
     }
-    
-    private var emojiChoices = ["🎃", "👻", "👿", "☠️", "👽", "🕷", "🍎", "🍐", "🦃"]
-    
-    private var emoji = [Int:String]()
-    
+
+    //private var emojiChoices = ["🎃", "👻", "👿", "☠️", "👽", "🕷", "🍎", "🍐", "🦃"]
+    private var emojiChoices = "🎃👻👿☠️👽🕷🍎🍐🦃"
+
+    private var emoji = [Card:String]()
+
     private func emoji(for card: Card) -> String {
-        if emoji[card.identifier] == nil, emojiChoices.count > 0 {
-            emoji[card.identifier] = emojiChoices.remove(at: emojiChoices.count.arc4random)
+        if emoji[card] == nil, emojiChoices.count > 0 {
+            let randomStringIndex = emojiChoices.index(emojiChoices.startIndex, offsetBy: emojiChoices.count.arc4random)
+            emoji[card] = String(emojiChoices.remove(at: randomStringIndex))
         }
-        return emoji[card.identifier] ?? "?"
+        return emoji[card] ?? "?"
     }
 }
 
