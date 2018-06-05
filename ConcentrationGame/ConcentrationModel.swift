@@ -13,6 +13,9 @@ class ConcentrationModel {
     private(set) var cards = [Card]()
 
     private var indexOfOneAndOnlyFaceUpCard: Int? {
+        // Return nil if no cards are face up or if more than one
+        // cards is face tup, otherwise return the index of the one
+        // face up card.
         get {
             var foundIndex: Int?
             for index in cards.indices {
@@ -26,6 +29,8 @@ class ConcentrationModel {
             }
             return foundIndex
         }
+
+        // Set each card to face down, except for the one being set now.
         set {
             for index in cards.indices {
                 cards[index].isFaceUp = (index == newValue)
@@ -43,14 +48,13 @@ class ConcentrationModel {
                     cards[matchIndex].isMatched = true
                     cards[index].isMatched = true
                 }
-                cards[index].isFaceUp = true
                 indexOfOneAndOnlyFaceUpCard = nil
+                cards[index].isFaceUp = true
+                cards[matchIndex].isFaceUp = true
             } else {
                 indexOfOneAndOnlyFaceUpCard = index
             }
-
         }
-        //cards[index].isFaceUp = !cards[index].isFaceUp
     }
 
     init(numberOfPairsOfCards: Int) {
