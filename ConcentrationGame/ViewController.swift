@@ -77,12 +77,10 @@ class ViewController: UIViewController {
 
 extension Int {
     var arc4random: Int {
-        if self > 0 {
-            return Int(arc4random_uniform(UInt32(self)))
-        } else if self < 0 {
-            return -Int(arc4random_uniform(UInt32(abs(self))))
-        } else {
-            return 0
+        // Generate a random value between 0 and the int value (half open) of the correct sign.  For 0, return 0.
+        switch self {
+        case 0 : return 0;
+        default: return self > 0 ? Int(arc4random_uniform(UInt32(self))) : -Int(arc4random_uniform(UInt32(abs(self))))
         }
     }
 }
